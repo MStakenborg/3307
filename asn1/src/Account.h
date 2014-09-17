@@ -2,7 +2,7 @@
  * Account.h
  *
  *  Created on: Sep 15, 2014
- *      Author: Sparky
+ *      Author: Team 5
  */
 
 #ifndef ACCOUNT_H_

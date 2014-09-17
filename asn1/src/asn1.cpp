@@ -14,12 +14,11 @@ int openAccount(){
 	std::string type;
 	int initBal;
 	int pin;
-
-	cout << "Are you opening a chequing or savings account?" << endl;
+	cout << "Are you opening a chequing or savings account?\n" << endl;
 	cin >> type;
-	cout << "Enter a 4 digit PIN number for your new account: " << endl;
+	cout << "Enter a 4 digit PIN number for your new account:\n " << endl;
 	cin >> pin;
-	cout << "Enter the initial balance for the account" << endl;
+	cout << "Enter the initial balance for the account\n" << endl;
 	cin >> initBal;
 	Account acct(initBal, pin, type);
 	return 0;

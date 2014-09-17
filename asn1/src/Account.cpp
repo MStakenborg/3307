@@ -15,15 +15,20 @@ using namespace std;
 	int acctId;
 	std::string type;
 	int pin;
-	int count = 0;
+	int idTally = 0;
 
 /*constructor*/
 Account::Account(float bal, int pinNum, std::string accType) {
 	balance = bal;
 	pin = pinNum;
 	type = accType;
-	acctId = count; /// we should change this .. just a placeholder
-	count++;
+	acctId = idTally; /// we should change this .. just a placeholder
+	idTally++;
+}
+
+/*deconstructor */
+Account::~Account(void){
+
 }
 
 /*get the current balance for selected account*/
@@ -53,7 +58,4 @@ void subBal(float amt){
 	else {
 		balance = balance - amt;
 	}
-
-	/*deconstructor */
-
 };

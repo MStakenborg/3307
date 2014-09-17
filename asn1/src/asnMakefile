@@ -1,0 +1,17 @@
+all: asn1
+
+asn1: asn1.o account.o maint.o
+	g++ asn1.o account.o maint.o
+
+asn1.o: asn1.cpp
+	g++ -c asn1.cpp
+
+account.o: account.cpp account.h
+	g++ -c account.cpp
+
+maint.o: maint.cpp maint.h
+	g++ -c maint.cpp
+
+clean: rm -rf *o asn1
+
+
