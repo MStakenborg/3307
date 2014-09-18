@@ -10,6 +10,7 @@
 
 class Maint {
 public:
+	Maint();
 	Maint(int id);
 	virtual ~Maint();
 };

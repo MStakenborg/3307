@@ -18,11 +18,17 @@ class Account {
 		int pin;
 
 	public:
-		Account(float bal, int pinNum, std::string type);
+		Account();
+		Account(float, int, std::string, int);
 		~Account();
 		float getBal();
-		void addBal();
-		void subBal();
+		int getId();
+		int getPin();
+		void setId(int);
+		void setPin(int);
+		//void transFunds(Account, int, Account, int);
+		void addBal(float);
+		int subBal(float);
 };
 
 #endif /* ACCOUNT_H_ */
