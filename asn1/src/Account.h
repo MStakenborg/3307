@@ -9,23 +9,21 @@
 #define ACCOUNT_H_
 #include <string>
 
+using namespace std;
+
 class Account {
 
 	protected:
 		float balance;
-		int acctId;
-		char acctType[8];
-		int pin;
+		bool initialized;
+		string type;
 
 	public:
 		Account();
-		Account(float, int, std::string, int);
+		Account(float, string);
 		~Account();
 		float getBal();
-		int getId();
-		int getPin();
-		void setId(int);
-		void setPin(int);
+		bool getIni();
 		//void transFunds(Account, int, Account, int);
 		void addBal(float);
 		int subBal(float);
