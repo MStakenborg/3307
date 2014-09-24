@@ -47,7 +47,6 @@ bool Account::getIni(){
 /*deposit money into current account*/
 void Account::addBal(float amt){
 	balance += amt;
-	cout << "Deposit transaction successful. Thank you!\n" << endl;
 }
 
 /*withdraw money from current account, surcharge if over 1000 and error if insufficient funds*/
@@ -55,31 +54,31 @@ int Account::subBal(float amt){
 	float checkBal = balance;
 	char ans;
 	if((checkBal - amt) < 0){
-		cout << "There is insufficient funds to process this transaction.\nRequest Denied. Transaction Cancelled.\n" << endl;
+		cout << "\nThere is insufficient funds to process this transaction.\nRequest Denied. Transaction Cancelled.\n" << endl;
 		return 0;
 	}
 	else if (type == "Chq"){
 		if (checkBal - amt < 1000){
 			if ((checkBal - amt - 2) < 0){
-				cout << "Current withdraw subject to $2.00 Surcharge. Insufficient Funds.\nRequest Denied. Transaction Cancelled.\n" << endl;
-				return 1;
+				cout << "\nCurrent withdraw subject to $2.00 Surcharge. Insufficient Funds.\nRequest Denied. Transaction Cancelled.\n" << endl;
+				return 0;
 			}
 			else {
-				cout << "Your balance after withdraw will be less than 1000 and subject to a $2.00 charge\nPress Y to continue or any other key to cancel request: Y/N?\n ";
+				cout << "\nYour balance after withdraw will be less than 1000 and subject to a $2.00 charge\nPress Y to continue or any other key to cancel request: Y/N?\n ";
 				cin >> ans;
-				if (ans = 'Y' || 'y'){
+				if (ans == 'Y' || ans == 'y'){
 					balance = (balance - amt - 2);
 					cout << "Transaction successful. Thank you!\n" << endl;
-					return 0;
+					return 1;
 				}
 				else{
-					cout << "Your transaction has been cancelled. Surcharge was declined by customer.\n" << endl;
-					return 1;
+					cout << "\nYour transaction has been cancelled. Surcharge was declined by customer.\n" << endl;
+					return 0;
 				}
 			}
 		}
 	}
 	balance = balance - amt; 
-	cout << "Withdraw transaction successful. Thank you!\n" << endl;
-	return 0;
+	cout << "Transaction successful. Thank you!\n" << endl;
+	return 1;
 };

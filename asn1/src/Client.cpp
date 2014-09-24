@@ -72,10 +72,10 @@ void Client::depSav(float amt){
 	savAcc.addBal(amt);
 }
 
-void Client::withChq(float amt){
-	chqAcc.subBal(amt);
+int Client::withChq(float amt){
+	return chqAcc.subBal(amt);
 }
 
-void Client::withSav(float amt){
-	savAcc.subBal(amt);
+int Client::withSav(float amt){
+	return savAcc.subBal(amt);
 }

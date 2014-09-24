@@ -3,42 +3,25 @@
 #include <stdlib.h>
 #include "Client.h"
 #include "Account.h"
-#include "Maint.h"
 #include <vector>
+#include <iomanip>
 
 using namespace std;
-int numCust = 1000;
-void choose();
-int action;
+
 float amt;		//amount for withdraw or deposit
-int id;
 string userId;
 string pin;
 string option;
-int pNum;		//pin and id to search for current account -deposits and withdraws
-int cnt=0;		//keeps track of number of customers and place in accounts array 
-Maint* maintAccts = new Maint[100];
-Account* custAccts = new Account[numCust];
 vector<Client> clientList;
-int MAXCUST = numCust+1;
+bool trace;
 
 void menu();
 void signUp();
 void signIn();
 void clientOptions(int i);
+void transferToUser(int i, int user, string type);
+void printInfo(int i);
 
-/*Account searchAcc(int id){
-	Account findMe; 
-	findMe.setPin(-1);
-	//search for account with given id 
-	for (int i = 0; i <= cnt; i++) {
-		if (custAccts[i].getId() == id){
-			findMe = custAccts[i];
-		}
-	}
-	return findMe;
-}
-*/
 
 int clientExists(string id){
 	for (int i = 0; i < clientList.size(); i++){
@@ -48,18 +31,6 @@ int clientExists(string id){
 	return -1;
 }
 
-/*verify an account exists
-int verify(Account ver, int id){
-	ver = searchAcc(id);
-	if (ver.getPin() == -1){
-		cout << "That account does not exist. Please try again.\n" << endl;
-		return 1;
-	}
-	return 0;
-}
-*/
-
-/*open an account - this needs work still .. just put something in for now */
 int openAccount(int i){
 	string type;
 	float initBal;
@@ -97,6 +68,7 @@ int openAccount(int i){
 	cout << "\nAccount successfully opened. Thank you!\n" << endl;
 	return 1;
 }
+
 /*close an account - delete account from tree*/
 void closeAccount(int i){
 	//find account with matching id and if pin is correct and balance is 0? close account 
@@ -148,6 +120,7 @@ void closeAccount(int i){
 		closeAccount(i);
 	}
 }
+
 /*deposit money*/
 void deposit(int i){
 	cout << "\nEnter:\n0 to deposit to your chequing account\n1 to deposit to your savings account\nx to cancel\n\n ";
@@ -157,6 +130,7 @@ void deposit(int i){
 			cout << "\n\nHow much would you like to deposit today?\n";
 			cin >> amt;
 			clientList[i].depChq(amt);
+			cout << "Deposit transaction successful. Thank you!\n\n";
 			cout << "\nYour chequing account balance is now: $" << clientList[i].getChq().getBal() << "\n\n";
 		}
 		else {
@@ -169,6 +143,7 @@ void deposit(int i){
 			cout << "\n\nHow much would you like to deposit today?\n";
 			cin >> amt;
 			clientList[i].depSav(amt);
+			cout << "Deposit ransaction successful. Thank you!\n\n";
 			cout << "\nYour savings account balance is now: $" << clientList[i].getSav().getBal() << "\n\n";
 		}
 		else {
@@ -184,13 +159,14 @@ void deposit(int i){
 		closeAccount(i);
 	}
 }
+
 /*withdraw money*/
 void withdraw(int i) {
 	cout << "\nEnter:\n0 to withdraw from your chequing account\n1 to withdraw from your savings account\nx to cancel\n\n ";
 	cin >> option;
 	if (option == "0"){
 		if (clientList[i].getChq().getIni()){
-			cout << "\nHow much would you like to withdraw today?\n";
+			cout << "\nHow much would you like to withdraw today?\n\n";
 			cin >> amt;
 			clientList[i].withChq(amt);
 			cout << "\nYour chequing account balance is now: $" << clientList[i].getChq().getBal() << "\n\n";
@@ -222,7 +198,6 @@ void withdraw(int i) {
 }
 
 /*check balance*/
-
 void checkBal(int i){
 	if (clientList[i].getChq().getIni()){
 		cout << "\nYour chequing account balance is : $" << clientList[i].getChq().getBal();
@@ -233,49 +208,223 @@ void checkBal(int i){
 	cout << "\n\n";
 }
 
-/*transfer funds between two accounts*/
-/*
-void transfer() {
-	Account a; 
-	Account b;
-	int sendId;
-	int recId;
-	cout << "Enter the account ID for sender's account: \n->";
-	cin >> sendId;
-	a = searchAcc(sendId);
-	if (verify(a,sendId)){
-		transfer();
+void transfer(int i) {
+
+	int user;
+	cout << "\nEnter:\n0 to transfer from your chequing account to your savings account\n1 to transfer from your savings account to your chequing account\n" <<
+			"2 to transfer from your chequing account to another user's account\n3 to transfer from your savings account to another user's account\nx to cancel\n\n ";
+	cin >> option;
+	if (option == "0"){
+		if (clientList[i].getChq().getIni() && clientList[i].getSav().getIni()){
+			cout << "\nHow much would you like to transfer?\n";
+			cin >> amt;
+			if (clientList[i].withChq(amt) > 0){
+				clientList[i].depSav(amt);
+				checkBal(i);
+				clientOptions(i);
+			}
+			else {
+				transfer(i);
+			}
+		}
+		else {
+			cout << "\nYou don't have a both a chequing and savings account\n";
+			transfer(i);
+		}
+
 	}
-	cout << "Enter PIN for sender's account: \n ->";
-	cin >> pNum; 
-	while (pNum != custAccts[sendId].getPin()){
-		cout << "Incorrect PIN. Please Try Again:\n -> ";
-		cin >> pNum;
+	else if (option == "1"){
+		if (clientList[i].getChq().getIni() && clientList[i].getSav().getIni()){
+			cout << "\nHow much would you like to transfer?\n";
+			cin >> amt;
+			if (clientList[i].withSav(amt) > 0){
+				clientList[i].depChq(amt);
+				checkBal(i);
+				clientOptions(i);
+			}
+			else {
+				transfer(i);
+			}
+		}
+		else {
+			cout << "\nYou don't have both a chequing and savings account\n";
+			transfer(i);
+		}
 	}
-	cout << "Enter the account ID for receiver's account: \n ->";
-	cin >> recId; 
-	b = searchAcc(recId);
-	if (verify(b,recId)){
-		transfer();
+	else if (option == "2"){
+		if (clientList[i].getChq().getIni()){
+			cout << "\nEnter the user ID you wish to transfer money to:\n";
+			cin >> userId;
+			user = clientExists(userId);
+			if (user > 0){
+				transferToUser(i, user, "chq");
+			}
+			else {
+				cout << "\nThat user does not exist\n";
+				transfer(i);
+			}
+		}
+		else {
+			cout << "\nYou don't have a chequing account\n";
+			transfer(i);
+		}
 	}
-	cout << "Enter the amount to transfer: \n ->";
-	cin >> amt; 
-	a = custAccts[sendId]; 
-	b = custAccts[recId];
-	if (a.subBal(amt)){
-		b.addBal(amt);
-		cout << "Transaction Complete. Thank you!" << endl;
+	else if (option == "3"){
+		if (clientList[i].getSav().getIni()){
+			cout << "\nEnter the user ID you wish to transfer money to:\n";
+			cin >> userId;
+			user = clientExists(userId);
+			if (user > 0){
+				transferToUser(i, user, "sav");
+			}
+			else {
+				cout << "\nThat user does not exist\n";
+				transfer(i);
+			}
+		}
+		else {
+			cout << "\nYou don't have a savings account\n";
+			transfer(i);
+		}
 	}
-	//go back so they can do more transactions if they want
-	choose();
+	else if (option == "x"){
+		clientOptions(i);
+	}
+	else {
+		cout << "\nInvalid input\n";
+		transfer(i);
+	}
 }
-/*maintenance login*/
-int maint() {
-	return 0;
+
+void transferToUser(int i, int user, string type){
+	cout << "\nEnter:\n0 to transfer to their chequing account\n1 to transfer to their savings account\nx to cancel\n\n ";
+	cin >> option;
+	if (option == "0"){
+		if (clientList[user].getChq().getIni()){
+			cout << "\nHow much would you like to transfer?\n";
+			cin >> amt;
+			if (type == "sav"){
+				if (clientList[i].withSav(amt) > 0){
+					clientList[user].depChq(amt);
+					checkBal(i);
+					clientOptions(i);
+				}
+				else {
+					transferToUser(i, user, type);
+				}
+			}
+			else {
+				if (clientList[i].withChq(amt) > 0){
+					clientList[user].depChq(amt);
+					checkBal(i);
+					clientOptions(i);
+				}
+				else {
+					transferToUser(i, user, type);
+				}
+			}
+		}
+		else {
+			cout << "\nThe user does not have a chequing account\n";
+			transferToUser(i, user, type);
+		}
+	}
+	else if (option == "1"){
+		if (clientList[user].getSav().getIni()){
+			cout << "\nHow much would you like to transfer?\n";
+			cin >> amt;
+			if (type == "sav"){
+				if (clientList[i].withSav(amt) > 0){
+					clientList[user].depSav(amt);
+					checkBal(i);
+					clientOptions(i);
+				}
+				else {
+					transferToUser(i, user, type);
+				}
+			}
+			else {
+				if (clientList[i].withChq(amt) > 0){
+					clientList[user].depSav(amt);
+					checkBal(i);
+					clientOptions(i);
+				}
+				else {
+					transferToUser(i, user, type);
+				}
+			}
+		}
+		else {
+			cout << "\nThe user does not have a savings account\n";
+			transferToUser(i, user, type);
+		}
+	}
+	else if (option == "x"){
+		transfer(i);
+	}
+	else {
+		cout << "\nInvalid input\n";
+		transferToUser(i, user, type);
+	}
+}
+
+void printInfo(int i){
+	Client client = clientList[i];
+	cout << setw(20) << left << "\nID: " << client.getId() << "Pin: " << client.getPwd() << "Chequing: $" << client.getChq().getBal() << "Savings: $" << client.getSav().getBal();
+}
+
+void manager() {
+	cout << "\nEnter:\n0 to view the list of clients\n1 to view a client's information\n2 to view the information of all clientele\n3 to open an account"
+		<< "\n4 to close an account\nx to logout\n\n ";
+	cin >> option;
+	if (option == "0"){
+		cout << endl;
+		for (int i = 2; i < clientList.size(); i++){
+			cout << clientList[i].getId() << endl;
+		}
+		manager();
+	}
+	else if (option == "1"){
+		cout << "\nEnter the client's user ID: ";
+		cin >> userId;
+		int i = clientExists(userId);
+		if (i > 0){
+			printInfo(i);
+			manager();
+		}
+		else {
+			cout << "\nThat client does not exist\n";
+			manager();
+		}
+	}
+	else if (option == "2"){
+		for (int i = 2; i < clientList.size(); i++){
+			printInfo(i);
+		}
+		manager();
+	}
+	else if (option == "3"){
+
+	}
+	else if (option == "4"){
+
+	}
+	else if (option == "x"){
+		menu();
+	}
+	else {
+		cout << "\nInvalid input\n";
+		manager();
+	}
+}
+
+void maint() {
+
 }
 
 void clientOptions(int i){
-	cout << "Enter:\n 0 to open a chequing or savings account\n 1 to close an account\n 2 to check balance\n 3 to deposit money\n 4 to withdraw money \n 5 to transfer funds \n x to logout\n \n ";
+	cout << "Enter:\n 0 to open a chequing or savings account\n 1 to close an account\n 2 to check balance\n 3 to deposit money\n" 
+		<< " 4 to withdraw money \n 5 to transfer funds \n x to logout\n\n ";
 	cin >> option;
 	if (option == "0"){
 		openAccount(i);
@@ -298,7 +447,7 @@ void clientOptions(int i){
 		clientOptions(i);
 	}
 	else if (option == "5"){
-		//transferFunds(i);
+		transfer(i);
 		clientOptions(i);
 	}
 	else if (option == "x"){
@@ -321,11 +470,11 @@ void signIn(){
 			if (pin == clientList[i].getPwd()){
 				if (clientList[i].getId() == "manager"){
 					cout << "\nYou are now logged in as the bank manager.\n\n";
-					menu();
+					manager();
 				}
 				else if (clientList[i].getId() == "maintenance"){
 					cout << "\nYou are now logged in as the maintenance man.\n\n";
-					menu();
+					maint();
 				}
 				else {
 					cout << "\nYou are now logged in as " << userId << ".\n\n";
@@ -401,6 +550,5 @@ int main() {
 	clientList.push_back(Client("manager", "1234"));
 	clientList.push_back(Client("maintenance", "1234"));
 	menu();
-	//choose();
 	return 0;
 }
