@@ -34,8 +34,8 @@ public:
 	void setPwd(string);
 	void depChq(float);
 	void depSav(float);
-	int withChq(float);
-	int withSav(float);
+	void withChq(float);
+	void withSav(float);
 };
 
 #endif /* CLIENT_H_ */

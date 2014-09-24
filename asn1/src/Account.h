@@ -24,9 +24,9 @@ class Account {
 		~Account();
 		float getBal();
 		bool getIni();
-		//void transFunds(Account, int, Account, int);
 		void addBal(float);
-		int subBal(float);
+		string getTime();
+		void subBal(float);
 };
 
 #endif /* ACCOUNT_H_ */

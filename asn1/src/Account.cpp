@@ -2,8 +2,10 @@
  * Account.cpp
  *
  *  Created on: Sep 15, 2014
- *      Author: Sparky
+ *      Author: Team 5
  */
+
+#define _CRT_SECURE_NO_WARNINGS
 
 #include "Account.h"
 #include <iostream>
@@ -50,35 +52,6 @@ void Account::addBal(float amt){
 }
 
 /*withdraw money from current account, surcharge if over 1000 and error if insufficient funds*/
-int Account::subBal(float amt){
-	float checkBal = balance;
-	char ans;
-	if((checkBal - amt) < 0){
-		cout << "\nThere is insufficient funds to process this transaction.\nRequest Denied. Transaction Cancelled.\n" << endl;
-		return 0;
-	}
-	else if (type == "Chq"){
-		if (checkBal - amt < 1000){
-			if ((checkBal - amt - 2) < 0){
-				cout << "\nCurrent withdraw subject to $2.00 Surcharge. Insufficient Funds.\nRequest Denied. Transaction Cancelled.\n" << endl;
-				return 0;
-			}
-			else {
-				cout << "\nYour balance after withdraw will be less than 1000 and subject to a $2.00 charge\nPress Y to continue or any other key to cancel request: Y/N?\n ";
-				cin >> ans;
-				if (ans == 'Y' || ans == 'y'){
-					balance = (balance - amt - 2);
-					cout << "Transaction successful. Thank you!\n" << endl;
-					return 1;
-				}
-				else{
-					cout << "\nYour transaction has been cancelled. Surcharge was declined by customer.\n" << endl;
-					return 0;
-				}
-			}
-		}
-	}
-	balance = balance - amt; 
-	cout << "Transaction successful. Thank you!\n" << endl;
-	return 1;
+void Account::subBal(float amt){
+	balance -= amt;
 };

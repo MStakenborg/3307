@@ -16,6 +16,7 @@ string pwd;
 Account chqAcc;
 Account savAcc;
 
+
 /*constructors*/
 
 /*default constructor*/
@@ -72,10 +73,10 @@ void Client::depSav(float amt){
 	savAcc.addBal(amt);
 }
 
-int Client::withChq(float amt){
+void Client::withChq(float amt){
 	return chqAcc.subBal(amt);
 }
 
-int Client::withSav(float amt){
+void Client::withSav(float amt){
 	return savAcc.subBal(amt);
 }
