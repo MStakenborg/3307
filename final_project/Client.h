@@ -25,7 +25,7 @@ public:
 	~Client();
 	std::string getId();
 	std::string getPwd();
-	ChqAccount getChq();
+	ChqAccount& getChq();
 	Account getSav();
 	void setChq(ChqAccount);
 	void setSav(Account);
@@ -38,7 +38,6 @@ public:
 	void notify(std::string);
 	void getNotifications();
 	void purchase(float);
-	bool payment(float amt);
 	bool depositToCredit(float amt);
 };
 

@@ -45,7 +45,7 @@ string Client::getPwd() {
 }
 
 // returns chequing account
-ChqAccount Client::getChq(){
+ChqAccount& Client::getChq(){
 	return chqAcc;
 }
 
@@ -94,10 +94,12 @@ void Client::withSav(float amt){
 	return savAcc.subBal(amt);
 }
 
+// stores a notification
 void Client::notify(string n){
 	notifications.push_back(n);
 }
 
+// outputs notifications
 void Client::getNotifications(){
 	cout << endl;
 	if (notifications.size() != 0){
@@ -109,17 +111,16 @@ void Client::getNotifications(){
 	}
 }
 
+// handles purchase
 void Client::purchase(float amt){
 	chqAcc.purchase(amt);
 }
 
-bool Client::payment(float amt){
-	chqAcc.resetHistory();
-	return chqAcc.payment(amt);
-}
-
+// make a credit card payment (not end of month event)
 bool Client::depositToCredit(float amt){
+	// if deposit is successful
 	if (chqAcc.depositToCredit(amt)){
+		// if the account is no longer frozen, reset notifications (because they are frozen notifications)
 		if (!chqAcc.getFreeze()){
 			notifications.clear();
 		}

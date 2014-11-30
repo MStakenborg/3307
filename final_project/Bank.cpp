@@ -1,8 +1,8 @@
 /*
-* asn1.cpp
+* Bank.cpp
 *
-*  Created on: Sep 15, 2014
-*      Author: Team 5
+*  Created on: Nov 30, 2014
+*      Author: Team 14
 */
 
 #define _CRT_SECURE_NO_WARNINGS // programmed it in visual studio and I needed to add this to stop it from forcing me to use the non-standard ctime_s function
@@ -78,30 +78,30 @@ int Bank::openAccount(int i){
 				traceFile << getTime() << " --- " << userId << " opened a chequing account.\n";
 			}
 			cout << "\nEnter the initial balance for the account:\n\n ";
-			cin >> initBal;
+			cin >> initBal; // user enters initial balance for account
 			if (trace){
 				traceFile << getTime() << " --- " << userId << " entered $" << initBal << " as the chequing account's initial balance.\n";
 			}
 			cout << "\nEnter the credit limit for your credit card:\n\n ";
 			int initCredit;
-			cin >> initCredit;
+			cin >> initCredit; // user enters the credit card limit
 			if (trace){
 				traceFile << getTime() << " --- " << userId << " entered $" << initCredit << " as the credit card's limit.\n";
 			}
 			cout << "\nEnter the type of monthly credit card bill you want to use:\n\n 0 for full payment\n 1 for minimal payment(10%)\n\n ";
 			char asn;
-			cin >> asn;
+			cin >> asn; // user selects minimum or full payments for monthly credit card bill
 			if (asn == '0'){
 				if (trace){
 					traceFile << getTime() << " --- " << userId << " decided to pay their monthly credit card bills in full.\n";
 				}
-				clientList[i].setChq(ChqAccount(initBal, "Chq", initCredit, true));
+				clientList[i].setChq(ChqAccount(initBal, "Chq", initCredit, true)); // initializes the chequeing account
 			}
 			else if (asn == '1') {
 				if (trace){
 					traceFile << getTime() << " --- " << userId << " decided to pay the minimum amount for their monthly credit card bills\n";
 				}
-				clientList[i].setChq(ChqAccount(initBal, "Chq", initCredit, false));
+				clientList[i].setChq(ChqAccount(initBal, "Chq", initCredit, false)); // initializes the chequeing account
 			}
 			else {
 				if (trace){
@@ -818,16 +818,20 @@ void Bank::printInfo(int i){
 
 // manager option menu, completes all manager tasks based on user input
 void Bank::manager() {
+
+	// reads the manager notification file
 	ifstream readNotif;
 	readNotif.open("managerNotifications.txt");
 	cout << endl;
 	char output[100];
+	// output the managers notifications
 	if (readNotif.is_open()){
 		while (!readNotif.eof()){
 			readNotif >> output;
 			cout << " " << output;
 		}
 	}
+	// close the manager notification file
 	readNotif.close();
 	cout << "\nEnter:\n0 to view the list of clients\n1 to view a client's information\n2 to view the information of all clientele\n3 to view total bank funds"
 		<< "\n4 to open an account\n5 to close an account\nx to logout\n\n ";
@@ -1100,6 +1104,7 @@ void Bank::clientOptions(int i){
 		}
 		clientOptions(i);
 	}
+	// view credit card history
 	else if (option == "7"){
 		if (trace){
 			traceFile << getTime() << " --- " << userId << " has decided to display their monthly credit card history.\n";
@@ -1114,22 +1119,24 @@ void Bank::clientOptions(int i){
 		}
 		clientOptions(i);
 	}
+	// make a credit card payment
 	else if (option == "8"){
 		if (trace){
 			traceFile << getTime() << " --- " << userId << " has decided to make a credit card payment.\n";
 		}
-		// if chequing account exists, display transaction history
+		// if chequeing account exists
 		if (clientList[i].getChq().getIni()){
-			// prints transaction history
 			float amt;
 			cout << "Enter size of payment: ";
-			cin >> amt;
+			cin >> amt; // user enters amount of payment
+			// if the payment successfully goes through
 			if (clientList[i].depositToCredit(amt)){
 				if (trace){
 					traceFile << getTime() << " --- " << userId << " credit card payment successful.\n";
 					cout << "\nTransation successful\n";
 				}
 			}
+			// insufficient funds
 			else{
 				if (trace){
 					traceFile << getTime() << " --- " << userId << " credit card payment failed. Insufficient funds.\n";
@@ -1137,6 +1144,7 @@ void Bank::clientOptions(int i){
 				cout << "\nCredit card payment failed, insufficient funds\n";
 			}
 		}
+		// no chequeing account
 		else {
 			cout << "\nYou don't have a credit card\n";
 		}
@@ -1331,47 +1339,59 @@ void Bank::menu(){
 	}
 }
 
+// returns the client list
 vector<Client>& Bank::getClientList(){
 	return clientList;
 }
 
+// handles a purchase made at the vendor system
 void Bank::handlePurchase(int i, float amt, string purchase){
 	if (trace){
 		traceFile << getTime() << " --- " << clientList[i].getId() << "'s purchase made at vendor system applied.\n";
 	}
+	// applies the purchase
 	clientList[i].purchase(amt);
 
 	if (trace){
 		traceFile << getTime() << " --- " << clientList[i].getId() << "'s purchase made at vendor system recorded.\n\n";
 	}
+	// record the purchase in records
 	creditHistory.push_back(purchase);
 }
 
+// notifies the client when a purchase at the vendor system was declined because their card is frozen
 void Bank::notifyClient(int i, float amt){
 	ostringstream n;
 	n << "Purchase of $" << amt << " declined because your credit card is frozen." 
 		<< " Your outstanding debt is: $" << clientList[i].getChq().getOutstandingDebt();
-	clientList[i].notify(n.str());
+	clientList[i].notify(n.str()); // notifies
 	if (trace){
 		traceFile << getTime() << " --- " << clientList[i].getId() << "'s purchase made at vendor system declined. Client notified.\n\n";
 	}
 }
 
+// end of month event
 void Bank::endOfMonth(){
 	if (trace){
 		traceFile << getTime() << " --- " << " End of month event externally triggered.\n";
 	}
-	ofstream mNotif;
+	ofstream mNotif; // manager notification file
 	mNotif.open("managerNotifications.txt", ios::app);
+	// loops for every client in the bank
 	for (int i = 0; i < clientList.size(); i++){
-		ChqAccount cheq = clientList[i].getChq();
-		if (cheq.getIni()){
-			if (cheq.getFullAmount()){
-				if (clientList[i].payment(cheq.getDebt())){
+		// chequeing account of the client
+		ChqAccount *cheq = &clientList[i].getChq();
+		// if the chequeing account has been initialized
+		if ((*cheq).getIni()){
+			// if the user set to pay the full credit card debt
+			if ((*cheq).getFullAmount()){
+				// apply the payment, returns true if successful (if unsuccessful, the credit card is frozen)
+				if ((*cheq).payment((*cheq).getDebt())){
 					if (trace){
 						traceFile << getTime() << " --- " << clientList[i].getId() << "'s credit debt fully payed off\n";
 					}
 				}
+				// didn't have enough funds to apply the payment. credit card is frozen
 				else{
 					if (trace){
 						traceFile << getTime() << " --- " << clientList[i].getId() << "'s has insufficient funds to pay debt. Credit card frozen. Manager notified.\n";
@@ -1379,12 +1399,15 @@ void Bank::endOfMonth(){
 					mNotif << "---" << clientList[i].getId() << " had insufficient funds to pay credit debt. Their credit card has been frozen.\n";
 				}
 			}
+			// if the user set to pay the minimum credit card debt
 			else {
-				if (clientList[i].payment(0.1 * cheq.getDebt())){
+				// apply the payment, returns true if successful (if unsuccessful, the credit card is frozen)
+				if ((*cheq).payment(0.1 * (*cheq).getDebt())){
 					if (trace){
 						traceFile << getTime() << " --- " << clientList[i].getId() << "'s minimum credit card payment paid\n";
 					}
 				}
+				// didn't have enough funds to apply the payment. credit card is frozen
 				else{
 					if (trace){
 						traceFile << getTime() << " --- " << clientList[i].getId() << "'s has insufficient funds to pay minimum debt payment."
@@ -1395,5 +1418,6 @@ void Bank::endOfMonth(){
 			}
 		}
 	}
+	// closes manager notification file
 	mNotif.close();
 }
